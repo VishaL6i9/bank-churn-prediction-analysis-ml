@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bank Customer Churn Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+    <style>
+        .back {
+            background-image: url("{{ url_for('static', filename='image/12.png') }}");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+        .white {
+            color: white;
+        }
+        .space {
+            margin: 10px 30px;
+            padding: 8px 15px;
+            background: palegreen;
+            width: 500px
+        }
+        .gap {
+            padding: 10px 20px;
+        }
+        .black {
+            padding: 10px 15px;
+        }
+        .prediction-result {
+            background: skyblue;
+            padding: 2% 40%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        h1 {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body class="back">
+<div class="container">
+    <h1>BANK CUSTOMER CHURN PREDICTION</h1>
+
+    <!-- Main Input Form -->
+    <form class="form-group" action="{{ url_for('predict') }}" method="post">
+        <div class="row">
+            <div class="gap col-md-6">
+                <label class="black" for="CreditScore">Credit Score</label>
+                <input type="number" class="space form-control" step="0.01" name="CreditScore" placeholder="Credit Score" required="required" /><br>
+
+                <label class="black" for="Geography">Geography</label>
+                <select class="space form-control" name="Geography" id="Geography">
+                    <option value="0">FRANCE</option>
+                    <option value="1">SPAIN</option>
+                    <option value="2">GERMANY</option>
+                </select>
+
+                <label class="black" for="Gender">Gender</label>
+                <select class="space form-control" name="Gender" id="Gender">
+                    <option value="0">FEMALE</option>
+                    <option value="1">MALE</option>
+                </select>
+
+                <label class="black" for="Age">Age</label>
+                <input type="number" class="space form-control" name="Age" placeholder="Age" required="required" />
+
+                <label class="black" for="Tenure">Tenure</label>
+                <input type="number" class="space form-control" step="0.01" name="Tenure" placeholder="Tenure" required="required" /><br>
+            </div>
+
+            <div class="gap col-md-6">
+                <label class="black" for="Balance">Balance</label>
+                <input type="number" class="space form-control" step="0.01" name="Balance" placeholder="Balance" required="required" /><br>
+
+                <label class="black" for="NumOfProducts">Number of Products</label>
+                <select class="space form-control" name="NumOfProducts" id="NumOfProducts">
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                    <option value="4">Four</option>
+                </select>
+
+                <label class="black" for="HasCrCard">Has Credit Card</label>
+                <select class="space form-control" name="HasCrCard" id="HasCrCard">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+
+                <label class="black" for="IsActiveMember">Is Active Member</label>
+                <select class="space form-control" name="IsActiveMember" id="IsActiveMember">
+                    <option value="1">Active</option>
+                    <option value="0">Not Active</option>
+                </select>
+
+                <label class="black" for="EstimatedSalary">Estimated Salary</label>
+                <input type="number" class="space form-control" step="0.01" name="EstimatedSalary" placeholder="Estimated Salary" required="required" /><br>
+            </div>
+        </div>
+
+        <div style="padding: 2% 35%">
+            <button type="submit" class="btn btn-success btn-block" style="width: 350px; padding: 20px">Predict</button>
+        </div>
+    </form>
+
+    <div class="prediction-result">
+        {{ prediction_text }}
+    </div>
+</div>
+</body>
+</html>

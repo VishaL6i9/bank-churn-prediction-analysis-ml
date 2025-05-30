@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Customer Churn Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a00f4; /* Vivid Purple */
+            --secondary-color: #3f00ff; /* Electric Indigo */
+            --accent-color: #4cc9f0; /* Bright Cyan-Blue */
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --danger-color: #ff3333;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff, #f3e8ff, #d0f4ff);
+            min-height: 100vh;
+            padding-bottom: 50px;
+            color: var(--dark-color);
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+            overflow: hidden;
+            background: white;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: 600;
+            padding: 20px;
+            border-bottom: none;
+            text-align: center;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+            background: #fff;
+            color: var(--dark-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(106, 0, 244, 0.25);
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            border: none;
+            padding: 12px 30px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            color: white;
+            border-radius: 8px;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 0, 244, 0.4);
+        }
+
+        .prediction-result {
+            padding: 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease-in-out;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .prediction-churn {
+            background-color: rgba(255, 51, 51, 0.1);
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .prediction-no-churn {
+            background-color: rgba(75, 181, 67, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+        }
+
+        .input-group-text {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            position: relative;
+            margin-bottom: 30px;
+            color: var(--dark-color);
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--dark-color);
+        }
+    </style>
+
+</head>
+<body>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2 class="mb-0"><i class="fas fa-chart-line me-2"></i>Customer Churn Prediction</h2>
+                    <p class="mb-0 opacity-75">Predict the likelihood of customers leaving your bank</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <form action="{{ url_for('predict') }}" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4 class="section-title">Customer Information</h4>
+
+                                <div class="mb-4">
+                                    <label for="CreditScore" class="form-label">Credit Score</label>
+                                    <div class="position-relative">
+                                        <input type="number" class="form-control" name="CreditScore" placeholder="e.g. 650" required>
+                                        <i class="fas fa-credit-card input-icon"></i>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="Geography" class="form-label">Country</label>
+                                    <select class="form-select" name="Geography" id="Geography">
+                                        <option value="0">France</option>
+                                        <option value="1">Spain</option>
+                                        <option value="2">Germany</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="Gender" class="form-label">Gender</label>
+                                    <select class="form-select" name="Gender" id="Gender">
+                                        <option value="0">Female</option>
+                                        <option value="1">Male</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="Age" class="form-label">Age</label>
+                                    <div class="position-relative">
+                                        <input type="number" class="form-control" name="Age" placeholder="e.g. 35" required>
+                                        <i class="fas fa-user input-icon"></i>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="Tenure" class="form-label">Tenure (years)</label>
+                                    <div class="position-relative">
+                                        <input type="number" class="form-control" step="0.01" name="Tenure" placeholder="e.g. 2.5" required>
+                                        <i class="fas fa-calendar-alt input-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h4 class="section-title">Account Details</h4>
+
+                                <div class="mb-4">
+                                    <label for="Balance" class="form-label">Account Balance</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" step="0.01" name="Balance" placeholder="e.g. 12500.00" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="NumOfProducts" class="form-label">Number of Products</label>
+                                    <select class="form-select" name="NumOfProducts" id="NumOfProducts">
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                        <option value="4">Four</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="HasCrCard" class="form-label">Has Credit Card</label>
+                                    <select class="form-select" name="HasCrCard" id="HasCrCard">
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="IsActiveMember" class="form-label">Activity Status</label>
+                                    <select class="form-select" name="IsActiveMember" id="IsActiveMember">
+                                        <option value="1">Active</option>
+                                        <option value="0">Not Active</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="EstimatedSalary" class="form-label">Estimated Salary</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" step="0.01" name="EstimatedSalary" placeholder="e.g. 85000.00" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-predict btn-lg">
+                                <i class="fas fa-calculator me-2"></i> Predict Churn
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if prediction_text %}
+                    <div class="prediction-result {% if 'will leave' in prediction_text %}prediction-churn{% else %}prediction-no-churn{% endif %}">
+                        <h4 class="mb-3"><i class="fas fa-chart-pie me-2"></i>Prediction Result</h4>
+                        <p class="mb-0 fs-5">{{ prediction_text }}</p>
+                        {% if 'will leave' in prediction_text %}
+                        <i class="fas fa-exclamation-triangle mt-3" style="font-size: 2rem;"></i>
+                        {% else %}
+                        <i class="fas fa-check-circle mt-3" style="font-size: 2rem;"></i>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Add animation to form elements
+    document.addEventListener('DOMContentLoaded', function() {
+        const formElements = document.querySelectorAll('.form-control, .form-select, .btn');
+        formElements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.animation = `fadeInUp 0.5s ease-out forwards ${index * 0.1}s`;
+        });
+
+        // Add style tag for the animation
+        const style = document.createElement('style');
+        style.textContent = `
+                @keyframes fadeInUp {
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `;
+        document.head.appendChild(style);
+    });
+</script>
+</body>
+</html>
